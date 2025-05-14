@@ -18,6 +18,7 @@ import json
 import gc
 import time
 from plyfile import PlyData, PlyElement
+import open3d as o3d
 
 
 class Model(pl.LightningModule):
@@ -217,11 +218,11 @@ class Model(pl.LightningModule):
                 colors_255 = (data_reduced * 255).astype(np.uint8)
                 V = batch['vertices'][0].cpu().numpy()
                 F = batch['faces'][0].cpu().numpy()
-                if self.cfg.vertex_feature:
-                    colored_mesh = trimesh.Trimesh(vertices=V, faces=F, vertex_colors=colors_255, process=False)
-                else:
-                    colored_mesh = trimesh.Trimesh(vertices=V, faces=F, face_colors=colors_255, process=False)
-                colored_mesh.export(f'{save_dir}/feat_pca_{uid}_{view_id}.ply')
+
+                # NOTE: Below assumes features to be extracted on vertices (vertex_feature = True)
+                colored_mesh = o3d.geometry.TriangleMesh(vertices=o3d.utility.Vector3dVector(V), triangles=o3d.utility.Vector3iVector(F))
+                colored_mesh.vertex_colors = o3d.utility.Vector3dVector(data_reduced)
+                o3d.io.write_triangle_mesh(f'{save_dir}/feat_pca_{uid}_{view_id}.ply', colored_mesh)
                 ############
                 torch.cuda.empty_cache()
 
@@ -274,8 +275,10 @@ class Model(pl.LightningModule):
                 data_reduced = (data_reduced - data_reduced.min()) / (data_reduced.max() - data_reduced.min())
                 colors_255 = (data_reduced * 255).astype(np.uint8)
 
-                colored_mesh = trimesh.Trimesh(vertices=V, faces=F, face_colors=colors_255, process=False)
-                colored_mesh.export(f'{save_dir}/feat_pca_{uid}_{view_id}.ply')
+                # NOTE: Below assumes features to be extracted on vertices (vertex_feature = True)
+                colored_mesh = o3d.geometry.TriangleMesh(vertices=o3d.utility.Vector3dVector(V), triangles=o3d.utility.Vector3iVector(F))
+                colored_mesh.vertex_colors = o3d.utility.Vector3dVector(data_reduced)
+                o3d.io.write_triangle_mesh(f'{save_dir}/feat_pca_{uid}_{view_id}.ply', colored_mesh)
                 ############
 
         print("Time elapsed: " + str(time.time()-starttime))

@@ -13,7 +13,7 @@ _C.num_neg_random = 256
 _C.num_neg_hard_pc = 128
 _C.num_neg_hard_emb = 128
 
-_C.vertex_feature = False  # if true, sample feature on vertices; if false, sample feature on faces
+_C.vertex_feature = True  # if true, sample feature on vertices; if false, sample feature on faces
 _C.n_point_per_face = 2000
 _C.n_sample_each = 10000
 _C.preprocess_mesh = False
