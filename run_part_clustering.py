@@ -52,7 +52,10 @@ def export_colored_mesh_ply(V, F, FL, filename='segmented_mesh.ply'):
         color_with_alpha = np.append(color, 255)  # Add alpha value
         mesh.visual.face_colors[i] = color_with_alpha
 
-    mesh.export(filename)
+    # When saving, use open3d to write meshes visualizable in Cloudcompare
+    colored_mesh_o3d = o3d.geometry.TriangleMesh(vertices=o3d.utility.Vector3dVector(mesh.vertices), triangles=o3d.utility.Vector3iVector(mesh.faces))
+    colored_mesh_o3d.vertex_colors = o3d.utility.Vector3dVector(mesh.visual.vertex_colors[:, :-1] / 255.)
+    o3d.io.write_triangle_mesh(filename, colored_mesh_o3d)
     print(f"Exported mesh to {filename}")
 
 def export_pointcloud_with_labels_to_ply(V, VL, filename='colored_pointcloud.ply'):
