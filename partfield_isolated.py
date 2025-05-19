@@ -274,7 +274,7 @@ def predict(cfg):
             _, part_planes = torch.split(planes, [64, planes.shape[2] - 64], dim=2)
 
         if is_pc:
-            tensor_vertices = batch['pc'].reshape(1, -1, 3).cuda().to(torch.float16)
+            tensor_vertices = batch['pc'].reshape(1, -1, 3).cuda().to(torch.float32)
             point_feat = sample_triplane_feat(part_planes, tensor_vertices) # N, M, C
             point_feat = point_feat.cpu().detach().numpy().reshape(-1, 448)
 
